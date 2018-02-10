@@ -1,0 +1,9 @@
+[/]
+visible-name='Mono Powerline'
+login-shell=true
+custom-command='/usr/bin/fish'
+default-size-columns=120
+default-size-rows=50
+use-system-font=false
+use-custom-command=false
+font='DejaVuSansMono Nerd Font 10'

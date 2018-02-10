@@ -1,0 +1,85 @@
+---
+
+- hosts: localhost
+  become: yes
+
+  tasks:
+    - name: update apt repository
+      apt: update_cache=yes
+      ignore_errors: yes
+
+    - name: install packages
+      apt: name={{item}} state=installed
+      with_items:
+        - vim
+        - fish
+        - python-pip
+
+    - name: install virtualfish pip package
+      pip:
+        name: virtualfish
+
+    - name: install font
+      copy:
+        src: files/DejaVu Sans Mono Nerd Font Complete Mono.ttf
+        dest: /usr/share/fonts/truetype/dejavu/
+
+
+- hosts: localhost
+  vars:
+    path: /tmp/ansible
+
+  tasks:
+    - name: set fish as default shell
+      user:
+        name: "{{ ansible_user_id }}"
+        shell: /usr/bin/fish
+
+    - name: create a temp folder
+      tempfile:
+        state: directory
+      register: mktempd
+
+    - set_fact:
+        path: "{{ mktempd.path }}"
+
+    - debug:
+        msg: "Temp folder: {{ path }}"
+
+    - name: get omf
+      get_url:
+        url: https://get.oh-my.fish
+        dest: "{{ path }}"
+
+    - name: uninstall old omf installation
+      raw: "fish {{ path}}/install --uninstall --noninteractive -y"
+      ignore_errors: yes
+
+    - name: install omf
+      raw: "fish {{ path }}/install --noninteractive -y"
+
+    - name: create virtualenvs folder
+      file:
+        path: ~/.virtualenvs
+        state: directory
+
+    - name: install omf packages
+      with_items:
+        - z
+        - bobthefish
+        - https://github.com/jhillyerd/plugin-git
+        - https://github.com/rettier/phish.git
+        - virtualfish
+        - tmux
+      raw: fish -c 'omf install {{item}}'
+
+    - name: set bobthefish theme
+      raw: fish -c 'omf theme bobthefish'
+
+    - name: set gnome terminal profile
+      raw: "fish -c 'dconf dump /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ < files/terminal-profile.dconf'"
+
+    - name: delete temp folder
+      file:
+        path: "{{ path }}"
+        state: absent
