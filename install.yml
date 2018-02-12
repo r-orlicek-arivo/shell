@@ -1,11 +1,18 @@
 ---
 
-- hosts: localhost
+- name: get username
+  hosts: localhost
+  tasks:
+    - set_fact:
+        username: "{{ ansible_user_id }}"
+
+- name: super user actions
+  hosts: localhost
   become: yes
 
   tasks:
     - name: update apt repository
-      apt: update_cache=yes
+      apt: update_cache=yes cache_valid_time=3600
       ignore_errors: yes
 
     - name: install packages
@@ -23,18 +30,19 @@
       copy:
         src: files/DejaVu Sans Mono Nerd Font Complete Mono.ttf
         dest: /usr/share/fonts/truetype/dejavu/
+    
+    - name: set fish as default shell
+      user:
+        name: "{{ username }}"
+        shell: /usr/bin/fish
 
 
-- hosts: localhost
+- name: user actions
+  hosts: localhost
   vars:
     path: /tmp/ansible
 
   tasks:
-    - name: set fish as default shell
-      user:
-        name: "{{ ansible_user_id }}"
-        shell: /usr/bin/fish
-
     - name: create a temp folder
       tempfile:
         state: directory
@@ -70,14 +78,17 @@
         - https://github.com/jhillyerd/plugin-git
         - https://github.com/rettier/phish.git
         - virtualfish
-        - tmux
+        - tmux-zen
       raw: fish -c 'omf install {{item}}'
 
     - name: set bobthefish theme
       raw: fish -c 'omf theme bobthefish'
 
     - name: set gnome terminal profile
-      raw: "fish -c 'dconf dump /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ < files/terminal-profile.dconf'"
+      raw: "fish -c 'dconf load /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ < files/terminal-profile.dconf'"
+
+    - name: set mate terminal profile
+      raw: "bash -c 'cd files; ./mate-terminal-profile.sh'"
 
     - name: delete temp folder
       file:
