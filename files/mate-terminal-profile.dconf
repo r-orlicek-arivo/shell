@@ -2,14 +2,14 @@
 scrollbar-position='hidden'
 cursor-shape='block'
 scroll-on-keystroke=false
-default-size-rows=24
+default-size-rows=60
 use-theme-colors=false
 custom-command='/usr/bin/fish'
 visible-name='Phish'
-use-custom-default-size=false
+use-custom-default-size=true
 login-shell=false
 background-image=''
-exit-action='hold'
+exit-action='close'
 backspace-binding='ascii-del'
 silent-bell=false
 foreground-color='#838394949696'
@@ -21,10 +21,10 @@ cursor-blink-mode='system'
 background-type='solid'
 default-show-menubar=false
 title-mode='replace'
-default-size-columns=80
-palette='#070736364242:#DCDC32322F2F:#858599990000:#B5B589890000:#26268B8BD2D2:#D3D336368282:#2A2AA1A19898:#EEEEE8E8D5D5:#00002B2B3636:#CBCB4B4B1616:#510BA17D1D43:#C4C4A0A00000:#72729F9FCFCF:#6C6C7171C4C4:#9393A1A1A1A1:#FDFDF6F6E3E3'
+default-size-columns=130
+palette='#070736364242:#DCDC32322F2F:#858599990000:#B5B589890000:#26268B8BD2D2:#D3D336368282:#2A2AA1A19898:#EEEEE8E8D5D5:#555557575353:#CBCB4B4B1616:#510BA17D1D43:#C4C4A0A00000:#72729F9FCFCF:#6C6C7171C4C4:#9393A1A1A1A1:#FDFDF6F6E3E3'
 allow-bold=false
-title='tmux'
+title='tmx'
 background-color='#0A0A28283333'
 font='DejaVuSansMono Nerd Font Mono 9'
 delete-binding='escape-sequence'
@@ -37,3 +37,4 @@ bold-color='#9393A1A1A1A1'
 word-chars='-A-Za-z0-9,./?%&#:_=+@~'
 scrollback-lines=512
 use-skey=true
+

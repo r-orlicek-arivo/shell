@@ -1,10 +1,19 @@
 ---
 
-- name: get username
+- name: setup
   hosts: localhost
   tasks:
     - set_fact:
         username: "{{ ansible_user_id }}"
+
+    - debug: msg="{{ ansible_distribution }}.yml {{ ansible_os_family }}.yml"
+
+    - name: load os vars
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+
 
 - name: super user actions
   hosts: localhost
@@ -21,6 +30,8 @@
         - vim
         - fish
         - python-pip
+        - git
+        - git-flow
 
     - name: install virtualfish pip package
       pip:
@@ -36,6 +47,20 @@
         name: "{{ username }}"
         shell: /usr/bin/fish
 
+    - check if ccat is installed:
+      stat: path=/usr/bin/ccat
+      register: ccat
+
+    - name: install ccat
+      get_url:
+        url: "{{ ccat_url }}"
+        dest: /tmp/ccat.tar.gz
+      when: ccat.stat.exists == False
+
+    - name: unpack ccat
+      raw: "cd /tmp && tar -xzvf ccat.tar.gz {{ ccat_dir }}/ccat && mv {{ ccat_dir }}/ccat /usr/bin/ccat && rm -r ccat.tar.gz {{ ccat_dir }}"
+      when: ccat.stat.exists == False
+
 
 - name: user actions
   hosts: localhost
@@ -43,28 +68,42 @@
     path: /tmp/ansible
 
   tasks:
+    - name: check if omf is installed
+      raw: fish -c 'omf'
+      ignore_errors: True
+      register: omf
+
+    - debug: msg="{{omf}}"
+
+    - set_fact:
+        install_omf: "{{ omf.rc != 0 }}"
+
+    - debug: msg="Oh my Fish already installed"
+      when: not install_omf
+
     - name: create a temp folder
       tempfile:
         state: directory
       register: mktempd
+      when: install_omf
 
     - set_fact:
         path: "{{ mktempd.path }}"
+      when: install_omf
 
     - debug:
         msg: "Temp folder: {{ path }}"
+      when: install_omf
 
     - name: get omf
       get_url:
         url: https://get.oh-my.fish
         dest: "{{ path }}"
-
-    - name: uninstall old omf installation
-      raw: "fish {{ path}}/install --uninstall --noninteractive -y"
-      ignore_errors: yes
+      when: install_omf
 
     - name: install omf
       raw: "fish {{ path }}/install --noninteractive -y"
+      when: install_omf
 
     - name: create virtualenvs folder
       file:
@@ -78,8 +117,7 @@
         - https://github.com/jhillyerd/plugin-git
         - https://github.com/rettier/phish.git
         - virtualfish
-        - tmux-zen
-      raw: fish -c 'omf install {{item}}'
+      raw: fish -c 'omf install {{item}}; omf update {{item}}'
 
     - name: set bobthefish theme
       raw: fish -c 'omf theme bobthefish'
@@ -94,3 +132,4 @@
       file:
         path: "{{ path }}"
         state: absent
+      when: install_omf
