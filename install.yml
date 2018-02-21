@@ -73,8 +73,6 @@
       ignore_errors: True
       register: omf
 
-    - debug: msg="{{omf}}"
-
     - set_fact:
         install_omf: "{{ omf.rc != 0 }}"
 
