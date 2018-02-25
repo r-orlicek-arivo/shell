@@ -47,7 +47,7 @@
         name: "{{ username }}"
         shell: /usr/bin/fish
 
-    - check if ccat is installed:
+    - name: check if ccat is installed
       stat: path=/usr/bin/ccat
       register: ccat
 
@@ -115,6 +115,7 @@
         - https://github.com/jhillyerd/plugin-git
         - https://github.com/rettier/phish.git
         - virtualfish
+        - fish_logo
       raw: fish -c 'omf install {{item}}; omf update {{item}}'
 
     - name: set bobthefish theme
