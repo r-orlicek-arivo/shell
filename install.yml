@@ -20,6 +20,10 @@
   become: yes
 
   tasks:
+    - name: add fish 2 ppa
+      apt_repository:
+        repo: 'ppa:fish-shell/release-2'
+
     - name: update apt repository
       apt: update_cache=yes cache_valid_time=3600
       ignore_errors: yes
@@ -29,6 +33,8 @@
       with_items:
         - vim
         - fish
+        - curl
+        - unzip
         - python-pip
         - git
         - git-flow
