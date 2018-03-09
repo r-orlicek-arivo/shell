@@ -32,6 +32,7 @@
         - python-pip
         - git
         - git-flow
+        - wmctrl
 
     - name: install virtualfish pip package
       pip:
