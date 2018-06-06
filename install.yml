@@ -39,6 +39,8 @@
         - git
         - git-flow
         - wmctrl
+        - xclip
+        - tmux
 
     - name: install virtualfish pip package
       pip:
@@ -133,6 +135,22 @@
 
     - name: set mate terminal profile
       raw: "bash -c 'cd files; ./mate-terminal-profile.sh'"
+
+    - name: tmux copy conf
+      copy:
+        src: files/tmux.conf
+        dest: ~/.tmux.conf
+
+    - name: tmux install tmp
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: ~/.tmux/plugins/tpm
+
+    - name: tmux reload
+      raw: "fish -c 'tmux source ~/.tmux.conf'"
+
+    - name: tmux tpm install other packages
+      raw: "bash -c '~/.tmux/plugins/tpm/scripts/install_plugins.sh'"
 
     - name: delete temp folder
       file:
