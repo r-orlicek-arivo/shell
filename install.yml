@@ -31,6 +31,8 @@
         - git
         - git-flow
         - tmux
+        - greadlink
+        - coreutils
 
 - name: super user actions
   hosts: localhost
