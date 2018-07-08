@@ -14,6 +14,25 @@
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
 
+- name: user actions
+  hosts: localhost
+  vars:
+    path: /tmp/ansible
+
+  tasks:
+    - name: install packages
+      when: ansible_os_family == "Darwin"
+      homebrew: name={{item}} state=installed
+      with_items:
+        - vim
+        - fish
+        - curl
+        - unzip
+        - git
+        - git-flow
+        - tmux
+        - greadlink
+        - coreutils
 
 - name: super user actions
   hosts: localhost
@@ -23,13 +42,16 @@
     - name: add fish 2 ppa
       apt_repository:
         repo: 'ppa:fish-shell/release-2'
+      when: ansible_os_family == "Debian"
 
     - name: update apt repository
       apt: update_cache=yes cache_valid_time=3600
       ignore_errors: yes
+      when: ansible_os_family == "Debian"
 
     - name: install packages
       apt: name={{item}} state=installed
+      when: ansible_os_family == "Debian"
       with_items:
         - vim
         - fish
@@ -38,6 +60,9 @@
         - python-pip
         - git
         - git-flow
+        - wmctrl
+        - xclip
+        - tmux
 
     - name: install virtualfish pip package
       pip:
@@ -46,7 +71,7 @@
     - name: install font
       copy:
         src: files/DejaVu Sans Mono Nerd Font Complete Mono.ttf
-        dest: /usr/share/fonts/truetype/dejavu/
+        dest: "{{ font_dir }}"
     
     - name: set fish as default shell
       user:
@@ -64,7 +89,7 @@
       when: ccat.stat.exists == False
 
     - name: unpack ccat
-      raw: "cd /tmp && tar -xzvf ccat.tar.gz {{ ccat_dir }}/ccat && mv {{ ccat_dir }}/ccat /usr/bin/ccat && rm -r ccat.tar.gz {{ ccat_dir }}"
+      raw: "cd /tmp && tar -xzvf ccat.tar.gz {{ ccat_dir }}/ccat && mv {{ ccat_dir }}/ccat {{ ccat_dest }}  && rm -r ccat.tar.gz {{ ccat_dir }}"
       when: ccat.stat.exists == False
 
 
@@ -138,9 +163,27 @@
 
     - name: set gnome terminal profile
       raw: "fish -c 'dconf load /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ < files/terminal-profile.dconf'"
+      when: ansible_os_family == "Debian"
 
     - name: set mate terminal profile
       raw: "bash -c 'cd files; ./mate-terminal-profile.sh'"
+      when: ansible_os_family == "Debian"
+
+    - name: tmux copy conf
+      copy:
+        src: files/tmux.conf
+        dest: ~/.tmux.conf
+
+    - name: tmux install tmp
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: ~/.tmux/plugins/tpm
+
+    - name: tmux reload
+      raw: "fish -c 'tmux source ~/.tmux.conf'"
+
+    - name: tmux tpm install other packages
+      raw: "bash -c '~/.tmux/plugins/tpm/scripts/install_plugins.sh'"
 
     - name: delete temp folder
       file:

@@ -1,0 +1,4 @@
+ccat_url: https://github.com/jingweno/ccat/releases/download/v1.1.0/darwin-amd64-1.1.0.tar.gz
+ccat_dir: darwin-amd64-1.1.0
+ccat_dest: /usr/local/bin/ccat
+font_dir: ~/Library/Fonts
