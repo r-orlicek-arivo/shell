@@ -2,3 +2,4 @@ ccat_url: https://github.com/jingweno/ccat/releases/download/v1.1.0/linux-amd64-
 ccat_dir: linux-amd64-1.1.0
 ccat_dest: /usr/bin/ccat
 font_dir: /usr/share/fonts/truetype/dejavu/
+shell_path: /usr/bin/env/fish
