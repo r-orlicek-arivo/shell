@@ -31,7 +31,6 @@
         - git
         - git-flow
         - tmux
-        - greadlink
         - coreutils
 
 - name: super user actions
@@ -76,7 +75,7 @@
     - name: set fish as default shell
       user:
         name: "{{ username }}"
-        shell: /usr/bin/fish
+        shell: "{{ shell_path }}"
 
     - name: check if ccat is installed
       stat: path=/usr/bin/ccat
