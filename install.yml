@@ -180,7 +180,7 @@
         dest: ~/.tmux/plugins/tpm
 
     - name: tmux reload
-      raw: "fish -c 'tmux source ~/.tmux.conf'"
+      raw: "fish -c 'tmux info 2>/dev/null ; and tmux source ~/.tmux.conf'"
 
     - name: tmux tpm install other packages
       raw: "bash -c '~/.tmux/plugins/tpm/scripts/install_plugins.sh'"
