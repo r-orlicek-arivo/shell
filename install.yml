@@ -3,16 +3,16 @@
 - name: setup
   hosts: localhost
   tasks:
-    - set_fact:
-        username: "{{ ansible_user_id }}"
+  - set_fact:
+      username: "{{ ansible_user_id }}"
 
-    - debug: msg="{{ ansible_distribution }}.yml {{ ansible_os_family }}.yml"
+  - debug: msg="{{ ansible_distribution }}.yml {{ ansible_os_family }}.yml"
 
-    - name: load os vars
-      include_vars: "{{ item }}"
-      with_first_found:
-        - "{{ ansible_distribution }}.yml"
-        - "{{ ansible_os_family }}.yml"
+  - name: load os vars
+    include_vars: "{{ item }}"
+    with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
 
 - name: user actions
   hosts: localhost
@@ -20,76 +20,80 @@
     path: /tmp/ansible
 
   tasks:
-    - name: install packages
-      when: ansible_os_family == "Darwin"
-      homebrew: name={{item}} state=installed
-      with_items:
-        - vim
-        - fish
-        - curl
-        - unzip
-        - git
-        - git-flow
-        - tmux
-        - coreutils
+  - name: install packages
+    when: ansible_os_family == "Darwin"
+    homebrew: name={{item}} state=installed
+    with_items:
+    - vim
+    - fish
+    - curl
+    - unzip
+    - git
+    - git-flow
+    - tmux
+    - coreutils
 
 - name: super user actions
   hosts: localhost
   become: yes
 
   tasks:
-    - name: add fish 2 ppa
-      apt_repository:
-        repo: 'ppa:fish-shell/release-2'
-      when: ansible_os_family == "Debian"
+  - name: add fish 2 ppa
+    apt_repository:
+      repo: 'ppa:fish-shell/release-2'
+    when: ansible_os_family == "Debian"
 
-    - name: update apt repository
-      apt: update_cache=yes cache_valid_time=3600
-      ignore_errors: yes
-      when: ansible_os_family == "Debian"
+  - name: update apt repository
+    apt: update_cache=yes cache_valid_time=3600
+    ignore_errors: yes
+    when: ansible_os_family == "Debian"
 
-    - name: install packages
-      apt: name={{item}} state=installed
-      when: ansible_os_family == "Debian"
-      with_items:
-        - vim
-        - fish
-        - curl
-        - unzip
-        - python-pip
-        - git
-        - git-flow
-        - wmctrl
-        - xclip
-        - tmux
+  - name: install c
+    apt: deb={{c_url}} state=installed
+    when: ansible_os_family == "Debian"
 
-    - name: install virtualfish pip package
-      pip:
-        name: virtualfish
+  - name: install packages
+    apt: name={{item}} state=installed
+    when: ansible_os_family == "Debian"
+    with_items:
+    - vim
+    - fish
+    - curl
+    - unzip
+    - python-pip
+    - git
+    - git-flow
+    - wmctrl
+    - xclip
+    - tmux
 
-    - name: install font
-      copy:
-        src: files/DejaVu Sans Mono Nerd Font Complete Mono.ttf
-        dest: "{{ font_dir }}"
-    
-    - name: set fish as default shell
-      user:
-        name: "{{ username }}"
-        shell: "{{ shell_path }}"
+  - name: install virtualfish pip package
+    pip:
+      name: virtualfish
 
-    - name: check if ccat is installed
-      stat: path=/usr/bin/ccat
-      register: ccat
+  - name: install font
+    copy:
+      src: files/DejaVu Sans Mono Nerd Font Complete Mono.ttf
+      dest: "{{ font_dir }}"
 
-    - name: install ccat
-      get_url:
-        url: "{{ ccat_url }}"
-        dest: /tmp/ccat.tar.gz
-      when: ccat.stat.exists == False
+  - name: set fish as default shell
+    user:
+      name: "{{ username }}"
+      shell: "{{ shell_path }}"
 
-    - name: unpack ccat
-      raw: "cd /tmp && tar -xzvf ccat.tar.gz {{ ccat_dir }}/ccat && mv {{ ccat_dir }}/ccat {{ ccat_dest }}  && rm -r ccat.tar.gz {{ ccat_dir }}"
-      when: ccat.stat.exists == False
+  - name: check if ccat is installed
+    stat: path=/usr/bin/ccat
+    register: ccat
+
+  - name: install ccat
+    get_url:
+      url: "{{ ccat_url }}"
+      dest: /tmp/ccat.tar.gz
+    when: ccat.stat.exists == False
+
+  - name: unpack ccat
+    raw: "cd /tmp && tar -xzvf ccat.tar.gz {{ ccat_dir }}/ccat && mv {{ ccat_dir }}/ccat {{ ccat_dest }}  && rm -r ccat.tar.gz {{ ccat_dir }}"
+    when: ccat.stat.exists == False
 
 
 - name: user actions
@@ -98,95 +102,95 @@
     path: /tmp/ansible
 
   tasks:
-    - name: check if omf is installed
-      raw: fish -c 'omf'
-      ignore_errors: True
-      register: omf
+  - name: check if omf is installed
+    raw: fish -c 'omf'
+    ignore_errors: True
+    register: omf
 
-    - set_fact:
-        install_omf: "{{ omf.rc != 0 }}"
+  - set_fact:
+      install_omf: "{{ omf.rc != 0 }}"
 
-    - debug: msg="Oh my Fish already installed"
-      when: not install_omf
+  - debug: msg="Oh my Fish already installed"
+    when: not install_omf
 
-    - name: create a temp folder
-      tempfile:
-        state: directory
-      register: mktempd
-      when: install_omf
+  - name: create a temp folder
+    tempfile:
+      state: directory
+    register: mktempd
+    when: install_omf
 
-    - set_fact:
-        path: "{{ mktempd.path }}"
-      when: install_omf
+  - set_fact:
+      path: "{{ mktempd.path }}"
+    when: install_omf
 
-    - debug:
-        msg: "Temp folder: {{ path }}"
-      when: install_omf
+  - debug:
+      msg: "Temp folder: {{ path }}"
+    when: install_omf
 
-    - name: get omf
-      get_url:
-        url: https://get.oh-my.fish
-        dest: "{{ path }}"
-      when: install_omf
+  - name: get omf
+    get_url:
+      url: https://get.oh-my.fish
+      dest: "{{ path }}"
+    when: install_omf
 
-    - name: install omf
-      raw: "fish {{ path }}/install --noninteractive -y"
-      when: install_omf
+  - name: install omf
+    raw: "fish {{ path }}/install --noninteractive -y"
+    when: install_omf
 
-    - name: create virtualenvs folder
-      file:
-        path: ~/.virtualenvs
-        state: directory
+  - name: create virtualenvs folder
+    file:
+      path: ~/.virtualenvs
+      state: directory
 
-    - name: clone fzf
-      git:
-        repo: "https://github.com/junegunn/fzf.git"
-        depth: 1
-        dest: "~/.fzf"
+  - name: clone fzf
+    git:
+      repo: "https://github.com/junegunn/fzf.git"
+      depth: 1
+      dest: "~/.fzf"
 
-    - name: update/install fzf
-      raw: fish -c "cd ~/.fzf ; ./install --no-bash --no-zsh --no-key-bindings --no-completion --no-update-rc"
+  - name: update/install fzf
+    raw: fish -c "cd ~/.fzf ; ./install --no-bash --no-zsh --no-key-bindings --no-completion --no-update-rc"
 
-    - name: install omf packages
-      with_items:
-        - z
-        - sudope
-        - bobthefish
-        - https://github.com/jhillyerd/plugin-git
-        - https://github.com/rettier/phish.git
-        - virtualfish
-        - fish_logo
-      raw: fish -c 'omf install {{item}}; omf update {{item}}'
+  - name: install omf packages
+    with_items:
+    - z
+    - sudope
+    - bobthefish
+    - https://github.com/jhillyerd/plugin-git
+    - https://github.com/rettier/phish.git
+    - virtualfish
+    - fish_logo
+    raw: fish -c 'omf install {{item}}; omf update {{item}}'
 
-    - name: set bobthefish theme
-      raw: fish -c 'omf theme bobthefish'
+  - name: set bobthefish theme
+    raw: fish -c 'omf theme bobthefish'
 
-    - name: set gnome terminal profile
-      raw: "fish -c 'dconf load /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ < files/terminal-profile.dconf'"
-      when: ansible_os_family == "Debian"
+  - name: set gnome terminal profile
+    raw: "fish -c 'dconf load /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ < files/terminal-profile.dconf'"
+    when: ansible_os_family == "Debian"
 
-    - name: set mate terminal profile
-      raw: "bash -c 'cd files; ./mate-terminal-profile.sh'"
-      when: ansible_os_family == "Debian"
+  - name: set mate terminal profile
+    raw: "bash -c 'cd files; ./mate-terminal-profile.sh'"
+    when: ansible_os_family == "Debian"
 
-    - name: tmux copy conf
-      copy:
-        src: files/tmux.conf
-        dest: ~/.tmux.conf
+  - name: tmux copy conf
+    copy:
+      src: files/tmux.conf
+      dest: ~/.tmux.conf
 
-    - name: tmux install tmp
-      git:
-        repo: https://github.com/tmux-plugins/tpm
-        dest: ~/.tmux/plugins/tpm
+  - name: tmux install tmp
+    git:
+      repo: https://github.com/tmux-plugins/tpm
+      dest: ~/.tmux/plugins/tpm
 
-    - name: tmux reload
-      raw: "fish -c 'tmux info 2>/dev/null ; and tmux source ~/.tmux.conf ; or true'"
+  - name: tmux reload
+    raw: "fish -c 'tmux info 2>/dev/null ; and tmux source ~/.tmux.conf ; or true'"
 
-    - name: tmux tpm install other packages
-      raw: "bash -c '~/.tmux/plugins/tpm/scripts/install_plugins.sh'"
+  - name: tmux tpm install other packages
+    raw: "bash -c '~/.tmux/plugins/tpm/scripts/install_plugins.sh'"
 
-    - name: delete temp folder
-      file:
-        path: "{{ path }}"
-        state: absent
-      when: install_omf
+  - name: delete temp folder
+    file:
+      path: "{{ path }}"
+      state: absent
+    when: install_omf
