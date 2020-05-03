@@ -22,7 +22,7 @@
   tasks:
   - name: install packages
     when: ansible_os_family == "Darwin"
-    homebrew: name={{item}} state=installed
+    homebrew: name={{item}} state=present
     with_items:
     - vim
     - fish
@@ -49,11 +49,11 @@
     when: ansible_os_family == "Debian"
 
   - name: install c
-    apt: deb={{c_url}} state=installed
+    apt: deb={{c_url}} state=present
     when: ansible_os_family == "Debian"
 
   - name: install packages
-    apt: name={{item}} state=installed
+    apt: name={{item}} state=present
     when: ansible_os_family == "Debian"
     with_items:
     - vim
