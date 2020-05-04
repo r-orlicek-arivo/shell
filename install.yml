@@ -82,7 +82,7 @@
       shell: "{{ shell_path }}"
 
   - name: check if ccat is installed
-    stat: path=/usr/bin/ccat
+    stat: "path={{ ccat_dest }}"
     register: ccat
 
   - name: install ccat
