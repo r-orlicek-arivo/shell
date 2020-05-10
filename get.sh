@@ -10,10 +10,6 @@ unamestr=`uname`
 if [[ "$unamestr" == 'Linux' ]]; then
     # install required packages via custom ppas
     sudo apt-get update
-    sudo apt-get install -y software-properties-common
-    sudo apt-add-repository ppa:fish-shell/release-2
-    sudo apt-add-repository ppa:ansible/ansible
-    sudo apt-get update 
     sudo apt-get install -y ansible curl unzip fish
 elif [[ "$unamestr" == 'Darwin' ]]; then
     brew update

@@ -22,27 +22,24 @@
   tasks:
   - name: install packages
     when: ansible_os_family == "Darwin"
-    homebrew: name={{item}} state=present
-    with_items:
-    - vim
-    - fish
-    - curl
-    - unzip
-    - git
-    - git-flow
-    - tmux
-    - coreutils
+    homebrew: 
+      state: present
+      name: 
+        - vim
+        - fish
+        - curl
+        - httpie
+        - unzip
+        - git
+        - git-flow
+        - tmux
+        - coreutils
 
 - name: super user actions
   hosts: localhost
   become: yes
 
   tasks:
-  - name: add fish 2 ppa
-    apt_repository:
-      repo: 'ppa:fish-shell/release-2'
-    when: ansible_os_family == "Debian"
-
   - name: update apt repository
     apt: update_cache=yes cache_valid_time=3600
     ignore_errors: yes
@@ -53,19 +50,21 @@
     when: ansible_os_family == "Debian"
 
   - name: install packages
-    apt: name={{item}} state=present
+    apt: 
+      state: present
+      name: 
+        - vim
+        - fish
+        - curl
+        - unzip
+        - python3-pip
+        - httpie
+        - git
+        - git-flow
+        - wmctrl
+        - xclip
+        - tmux
     when: ansible_os_family == "Debian"
-    with_items:
-    - vim
-    - fish
-    - curl
-    - unzip
-    - python-pip
-    - git
-    - git-flow
-    - wmctrl
-    - xclip
-    - tmux
 
   - name: install virtualfish pip package
     pip:
@@ -154,12 +153,10 @@
   - name: install omf packages
     with_items:
     - z
-    - sudope
     - bobthefish
     - https://github.com/jhillyerd/plugin-git
     - https://github.com/rettier/phish.git
     - virtualfish
-    - fish_logo
     raw: fish -c 'omf install {{item}}; omf update {{item}}'
 
   - name: set bobthefish theme
@@ -177,17 +174,6 @@
     copy:
       src: files/tmux.conf
       dest: ~/.tmux.conf
-
-  - name: tmux install tmp
-    git:
-      repo: https://github.com/tmux-plugins/tpm
-      dest: ~/.tmux/plugins/tpm
-
-  - name: tmux reload
-    raw: "fish -c 'tmux info 2>/dev/null ; and tmux source ~/.tmux.conf ; or true'"
-
-  - name: tmux tpm install other packages
-    raw: "bash -c '~/.tmux/plugins/tpm/scripts/install_plugins.sh'"
 
   - name: delete temp folder
     file:
