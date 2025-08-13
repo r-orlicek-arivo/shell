@@ -20,7 +20,8 @@ fi
 curl -L https://github.com/rettier/shell/archive/master.zip -o shell.zip 
 unzip shell.zip 
 cd shell-master 
-ansible-playbook install.yml
+python3 -m venv ~/.virtualenvs/virtualfish
+ansible-playbook ~/git/shell/install.yml
 
 # remove temp folder
 cd ~ 

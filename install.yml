@@ -68,6 +68,7 @@
 
   - name: install virtualfish pip package
     pip:
+      virtualenv: ~/.virtualenvs/virtualfish
       name: virtualfish
 
   - name: install font
