@@ -129,7 +129,7 @@
 
   - name: get omf
     get_url:
-      url: https://get.oh-my.fish
+      url: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install
       dest: "{{ path }}"
     when: install_omf
 
